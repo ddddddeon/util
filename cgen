@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+NAME=$1
+
+if [ $# -lt 1 ]; then
+    echo "Usage: cgen <project-name>"
+    exit 1
+fi
+
+mkdir -p "$NAME"/{"src","test",".vscode"}
+
+cat <<EOF > "$NAME"/Makefile
+NAME=$NAME
+LIBS=
+CFLAGS=-g -Wall \$(LIBS) #-DDEBUG
+
+CC=gcc
+OUTFILE=bin/\$(NAME)
+INFILES=\$(wildcard src/*.c)
+
+\$(NAME): 
+	set -e; \\
+	rm src/*~ src/\#* 2>/dev/null || true; \\
+	if [ ! -d bin ]; then mkdir bin; fi; \\
+	\$(CC) -o \$(OUTFILE) \$(INFILES) \$(CFLAGS)
+
+clean:	findBin
+	@rm -rf bin;
+
+findBin:
+	@[ -d bin ];
+
+install:
+	@mv bin/\$(NAME) /usr/bin/\$(NAME); \\
+	chmod a+x /usr/bin/\$(NAME); \\
+	echo "[OK] installed to /usr/bin/\$(NAME)";
+
+check:
+	@valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./bin/\$(NAME)
+
+trace:
+	@strace ./bin/\$(NAME)
+
+all: \$(NAME) findBin install
+
+rebuild: clean \$(NAME) install
+EOF
+
+
+cat <<EOF > "$NAME"/src/main.c
+#include "$NAME.h"
+
+int main(int argc, char* argv[]) {
+
+}
+EOF
+
+
+cat <<EOF > "$NAME"/src/"$NAME".c
+#include "$NAME.h"
+EOF
+
+
+NAME_UPPER=${NAME^^}
+cat <<EOF > "$NAME"/src/"$NAME".h
+#ifndef ${NAME_UPPER}_H
+#define ${NAME_UPPER}_H
+
+
+
+#endif /* !${NAME_UPPER}_H */
+EOF
+
+cat <<EOF > "$NAME"/.vscode/tasks.json
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "build",
+            "command": "/usr/bin/make",
+            "args": [],
+            "options": {
+                "cwd": "\${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        }
+    ],
+    "version": "2.0.0"
+}
+EOF
+
+cat <<EOF > "$NAME"/.vscode/launch.json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "\${workspaceFolder}/bin/$NAME",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "\${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
+EOF
+
+cat <<EOF > "$NAME"/.gitignore
+**/.vscode
+EOF
