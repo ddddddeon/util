@@ -113,4 +113,5 @@ EOF
 
 cat <<EOF > "$NAME"/.gitignore
 **/.vscode
+**/bin
 EOF
