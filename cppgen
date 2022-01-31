@@ -47,7 +47,7 @@ rebuild: clean \$(NAME) install
 EOF
 
 cat <<EOF > "$NAME"/src/main.cpp
-include "$NAME.h"
+#include "$NAME.h"
 
 int main(int argc, char* argv[]) {
 
