@@ -12,9 +12,9 @@ mkdir -p "$NAME"/{"src","test",".vscode"}
 cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
 LIBS=
-CFLAGS=-g -Wall \$(LIBS)
+CFLAGS=-g -Wall -fuse-ld=lld \$(LIBS)
 
-CC=g++
+CC=clang++
 OUTFILE=bin/\$(NAME)
 INFILES=\$(wildcard src/*.cpp)
 
@@ -24,10 +24,10 @@ INFILES=\$(wildcard src/*.cpp)
 	if [ ! -d bin ]; then mkdir bin; fi; \\
 	\$(CC) -o \$(OUTFILE) \$(INFILES) \$(CFLAGS)
 
-clean:	findBin
+clean:	find-bin
 	@rm -rf bin;
 
-findBin:
+find-bin:
 	@[ -d bin ];
 
 install:
@@ -35,13 +35,25 @@ install:
 	chmod a+x /usr/bin/\$(NAME); \\
 	echo "[OK] installed to /usr/bin/\$(NAME)";
 
+format:
+	@clang-format -i -style=google src/**/*.cpp src/**/*.h
+
+tidy:
+	@clang-tidy --checks=google-* -header-filter=.* src/**/*.cpp src/**/*.h
+
+lint:
+	@cpplint src/**/*.cpp src/**/*.h
+
 check:
 	@valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./bin/\$(NAME)
 
 trace:
 	@strace ./bin/\$(NAME)
 
-all: \$(NAME) findBin install
+sloc:
+	@git ls-files | xargs wc -l
+
+all: \$(NAME) find-bin install
 
 rebuild: clean \$(NAME) install
 EOF
