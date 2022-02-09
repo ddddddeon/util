@@ -36,13 +36,13 @@ install:
 	echo "[OK] installed to /usr/bin/\$(NAME)";
 
 format:
-	@clang-format -i -style=google src/**/*.cpp src/**/*.h
+	@clang-format -i -style=google **/*.cpp **/*.h
 
 tidy:
-	@clang-tidy --checks=google-* -header-filter=.* src/**/*.cpp src/**/*.h
+	@clang-tidy --checks=google-* -header-filter=.* **/*.cpp **/*.h
 
 lint:
-	@cpplint src/**/*.cpp src/**/*.h
+	@cpplint **/*.cpp **/*.h
 
 check:
 	@valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./bin/\$(NAME)
