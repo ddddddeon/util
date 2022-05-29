@@ -61,6 +61,8 @@ EOF
 cat <<EOF > "$NAME"/src/main.cpp
 #include "$NAME.h"
 
+using namespace "$NAME";
+
 int main(int argc, char* argv[]) {
 
 }
@@ -127,3 +129,5 @@ cat <<EOF > "$NAME"/.gitignore
 **/.vscode
 **/bin
 EOF
+
+clang-format -style=google -dump-config > "$NAME"/.clang-format
