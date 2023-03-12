@@ -44,3 +44,7 @@ fmt:
 lint:
 	cargo clippy
 EOF
+
+cat <<EOF > "$NAME"/.gitignore
+target/
+EOF
