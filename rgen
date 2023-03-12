@@ -15,19 +15,19 @@ NAME=$NAME
 
 .PHONY: run
 run:
-	cargo run --features $(FEATURES)
+	cargo run --features \$(FEATURES)
 
 .PHONY: build
 build:
-	cargo build --features $(FEATURES)
+	cargo build --features \$(FEATURES)
 
 .PHONY: test
 test:
-	cargo test --features $(FEATURES)
+	cargo test --features \$(FEATURES)
 
 .PHONY: release
 release:
-	cargo build --release --features $(FEATURES)
+	cargo build --release --features \$(FEATURES)
 
 .PHONY: install
 install:
