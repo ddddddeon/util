@@ -32,6 +32,10 @@ release:
 watch:
 	cargo watch -x "run"
 
+.PHONY: clean
+clean:
+	cargo clean
+
 .PHONY: install
 install:
 	mv target/release/\$(NAME) /usr/bin/
