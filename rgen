@@ -13,11 +13,11 @@ cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
 
 .PHONY: run
-run:
+run: lint
 	cargo run
 
 .PHONY: build
-build:
+build: lint
 	cargo build
 
 .PHONY: test
@@ -25,7 +25,7 @@ test:
 	cargo test
 
 .PHONY: release
-release:
+release: lint
 	cargo build --release
 
 .PHONY: watch
