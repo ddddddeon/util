@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+INFILE="$1"
+TYPE="$2"
+
+set -e
+
+if [[ -z $TYPE ]]; then
+    TYPE="html"
+fi
+
+if [[ $TYPE = "html" ]]; then
+    emacs "$INFILE" --batch -f org-html-export-to-html --kill
+elif [[ $TYPE = "pdf" ]]; then
+    emacs "$INFILE" --batch -f org-latex-export-to-pdf --kill
+elif [[ $TYPE = "md" ]]; then
+    emacs "$INFILE" --batch -f org-md-export-to-markdown --kill
+fi
+
+rm "${INFILE}.tmp."* 2>/dev/null || true
