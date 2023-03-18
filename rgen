@@ -28,6 +28,10 @@ test:
 release:
 	cargo build --release
 
+.PHONY: watch
+watch:
+	cargo watch -x "run"
+
 .PHONY: install
 install:
 	mv target/release/\$(NAME) /usr/bin/
