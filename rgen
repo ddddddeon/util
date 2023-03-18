@@ -30,7 +30,7 @@ release:
 
 .PHONY: watch
 watch:
-	cargo watch -x "run"
+	cargo watch -x "clippy; cargo run"
 
 .PHONY: clean
 clean:
