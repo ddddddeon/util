@@ -1,0 +1,23 @@
+#!/bin/bash
+
+cd ~/repos/unity
+tmux new-session -d -s work
+
+# emacs
+tmux rename-window editor
+
+# terminal
+tmux new-window -t work -n term
+tmux split-window -h
+tmux select-pane -t 0
+#tmux resize-pane -R 30
+
+# chatgpt
+tmux new-window -t work -n gpt
+tmux send-keys -t work:2 "aichat -r code" # don't send Enter immediately as it mangles repl output
+
+# kubernetes
+tmux new-window -t work -n k9s
+tmux send-keys -t work:3 'k9s' C-m
+
+tmux attach-session -t work:0

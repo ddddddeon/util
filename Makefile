@@ -1,5 +1,5 @@
+.PHONY: install
 install:
-	@cp cgen /usr/bin/cgen; \
-	cp cppgen /usr/bin/cppgen; \
-	cp rgen /usr/bin/rgen; \
-    cp docgen /usr/bin/docgen;
+	for FILE in $(shell ls | grep -v Makefile); do \
+		cp $${FILE} /usr/bin/$${FILE}; \
+	done
