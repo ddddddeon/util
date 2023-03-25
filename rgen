@@ -7,7 +7,12 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-cargo new "$NAME"
+LIB=""
+if [ ! -z $2 ]; then
+    LIB="--lib"
+fi
+
+bash -c "cargo new $NAME $LIB"
 
 cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
