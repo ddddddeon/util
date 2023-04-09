@@ -27,7 +27,7 @@ build: lint
 
 .PHONY: test
 test:
-	cargo test --nocapture
+	cargo test -- --nocapture
 
 .PHONY: release
 release: lint
