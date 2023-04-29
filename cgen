@@ -61,7 +61,7 @@ cat <<EOF > "$NAME"/src/"$NAME".c
 EOF
 
 
-NAME_UPPER=${NAME^^} | sed 's/-/_/g'
+NAME_UPPER=`echo ${NAME^^} | sed 's/-/_/g'`
 cat <<EOF > "$NAME"/src/"$NAME".h
 #ifndef ${NAME_UPPER}_H
 #define ${NAME_UPPER}_H
