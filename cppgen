@@ -7,7 +7,7 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-mkdir -p "$NAME"/{"src","test",".vscode"}
+mkdir -p "$NAME"/{"src","test"}
 
 cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
@@ -18,7 +18,7 @@ CC=clang++
 OUTFILE=bin/\$(NAME)
 INFILES=\$(wildcard src/*.cpp)
 
-\$(NAME): 
+\$(NAME):
 	set -e; \\
 	rm src/*~ src/\#* 2>/dev/null || true; \\
 	if [ ! -d bin ]; then mkdir bin; fi; \\
@@ -76,57 +76,7 @@ cat <<EOF > "$NAME"/src/"$NAME".h
 #pragma once
 EOF
 
-cat <<EOF > "$NAME"/.vscode/tasks.json
-{
-    "tasks": [
-        {
-            "type": "shell",
-            "label": "build",
-            "command": "/usr/bin/make",
-            "args": [],
-            "options": {
-                "cwd": "\${workspaceFolder}"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-        }
-    ],
-    "version": "2.0.0"
-}
-EOF
-
-cat <<EOF > "$NAME"/.vscode/launch.json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "(gdb) Launch",
-            "type": "cppdbg",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "\${workspaceFolder}/bin/$NAME",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "\${fileDirname}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
-        }
-    ]
-}
-EOF
-
 cat <<EOF > "$NAME"/.gitignore
-**/.vscode
 **/bin
 EOF
 
