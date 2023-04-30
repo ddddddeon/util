@@ -80,4 +80,4 @@ cat <<EOF > "$NAME"/.gitignore
 **/bin
 EOF
 
-clang-format -style=google -dump-config > "$NAME"/.clang-format
+clang-format -style="{BasedOnStyle: Google, IndentWidth: 4}" -dump-config > "$NAME"/.clang-format
