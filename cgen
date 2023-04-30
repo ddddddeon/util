@@ -72,3 +72,5 @@ cat <<EOF > "$NAME"/.gitignore
 **/bin
 src/third_party
 EOF
+
+clang-format -style="{BasedOnStyle: Google, IndentWidth: 4}" -dump-config > "$NAME"/.clang-format
