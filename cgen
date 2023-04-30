@@ -7,11 +7,11 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-mkdir -p "$NAME"/{"src/third_party","test"}
+mkdir -p "$NAME"/{"src","test"}
 
 cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
-LIBS=-Isrc/third_party
+LIBS=
 CFLAGS=-g -Wall \$(LIBS) #-DDEBUG
 
 CC=clang
