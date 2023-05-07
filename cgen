@@ -3,13 +3,20 @@
 NAME=$1
 
 if [ $# -lt 1 ]; then
-    echo "Usage: cgen <project-name>"
+    echo "Usage: cgen <project-name> [--lib]"
     exit 1
+fi
+
+LIB=""
+if [ ! -z $2 ]; then
+    LIB="true"
 fi
 
 mkdir -p "$NAME"/{"src","test"}
 
-cat <<EOF > "$NAME"/Makefile
+if [ -z $LIB ]; then
+
+    cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
 LIBS=
 CFLAGS=-g -Wall \$(LIBS) #-DDEBUG
@@ -22,7 +29,7 @@ INFILES=\$(wildcard src/*.c)
 	set -e; \\
 	rm src/*~ src/\#* 2>/dev/null || true; \\
 	if [ ! -d bin ]; then mkdir bin; fi; \\
-	\$(CC) -o \$(OUTFILE) \$(INFILES) \$(CFLAGS)
+	\$(CC) -o \$(OUTFILE) \$(INFILES) \$(CFLAGS);
 
 clean:	findBin
 	@rm -rf bin;
@@ -36,7 +43,7 @@ install:
 	echo "[OK] installed to /usr/bin/\$(NAME)";
 
 check:
-	@valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./bin/\$(NAME)
+	@valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./bin/\$(NAME);
 
 trace:
 	@strace ./bin/\$(NAME)
@@ -46,7 +53,7 @@ all: \$(NAME) findBin install
 rebuild: clean \$(NAME) install
 EOF
 
-cat <<EOF > "$NAME"/src/main.c
+    cat <<EOF > "$NAME"/src/main.c
 #include "$NAME.h"
 
 int main(int argc, char* argv[]) {
@@ -54,6 +61,80 @@ int main(int argc, char* argv[]) {
 }
 EOF
 
+else
+    cat <<EOF > "$NAME"/Makefile
+NAME=$NAME
+CC=clang
+LD=lld
+LIBS=
+INCLUDES=
+TEST_LIBS=-L./bin -l\$(NAME)
+USE_LINKER=-fuse-ld=\$(LD)
+CFLAGS=-g -Wall \$(INCLUDES)
+LIB_DIR=/usr/lib/
+LIB_NAME=lib\$(NAME).so
+LIB_OUTFILE=bin/\$(LIB_NAME)
+INFILES=\$(wildcard src/*.c)
+HEADER_INFILES=\$(wildcard src/*.h)
+HEADER_OUTPATH=/usr/include/
+TEST_INFILES=\$(wildcard test/*.c)
+TEST_OUTFILE=bin/test
+
+.PHONY: \$(NAME)
+
+\$(NAME): library
+	set -e; \
+	\$(CC) -shared -o \$(LIB_OUTFILE) \$(wildcard bin/*.o); \\
+	\$(CC) -o \$(TEST_OUTFILE) \$(TEST_INFILES) \$(LIB_OUTFILE) \$(CFLAGS) \$(USE_LINKER) \$(LIBS);
+
+library:
+	set -e; \
+	if [ ! -d bin ]; then mkdir bin; fi; \\
+	for FILE in \$(INFILES); do \\
+		\$(CC) \$(CFLAGS)-c -fPIC \$\$FILE -o bin/$\$(basename \$\${FILE%%.*}).o;\\
+	done;
+
+clean:	findBin
+	@rm -rf bin;
+
+findBin:
+	@[ -d bin ];
+
+install:
+	@cp \$(LIB_OUTFILE) \$(LIB_DIR)\$(LIB_NAME); \\
+	for FILE in \$(HEADER_INFILES); do \\
+		cp \$\$FILE \$(HEADER_OUTPATH)$\$(basename \$\${FILE%%.*}.h); \\
+	done;
+
+uninstall:
+	rm \$(LIB_DIR)\$(LIB_NAME); \\
+	rm \$(HEADER_OUTPATH)\$(NAME).h;
+
+.PHONY: test
+test:
+	bin/test;
+
+check:
+	@valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./bin/test;
+
+trace:
+	@strace ./bin/test
+
+all: \$(NAME) findBin install
+
+rebuild: clean \$(NAME) install
+
+EOF
+
+    cat <<EOF > "$NAME"/test/main.c
+#include "../src/$NAME.h"
+
+int main(int argc, char* argv[]) {
+
+}
+EOF
+
+fi
 
 cat <<EOF > "$NAME"/src/"$NAME".c
 #include "$NAME.h"
