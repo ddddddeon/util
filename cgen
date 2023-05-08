@@ -83,12 +83,12 @@ TEST_OUTFILE=bin/test
 .PHONY: \$(NAME)
 
 \$(NAME): library
-	set -e; \
+	set -e; \\
 	\$(CC) -shared -o \$(LIB_OUTFILE) \$(wildcard bin/*.o); \\
 	\$(CC) -o \$(TEST_OUTFILE) \$(TEST_INFILES) \$(LIB_OUTFILE) \$(CFLAGS) \$(USE_LINKER) \$(LIBS);
 
 library:
-	set -e; \
+	set -e; \\
 	if [ ! -d bin ]; then mkdir bin; fi; \\
 	for FILE in \$(INFILES); do \\
 		\$(CC) \$(CFLAGS)-c -fPIC \$\$FILE -o bin/$\$(basename \$\${FILE%%.*}).o;\\
@@ -111,7 +111,7 @@ uninstall:
 	rm \$(HEADER_OUTPATH)\$(NAME).h;
 
 .PHONY: test
-test:
+test: \$(NAME)
 	bin/test;
 
 check:
