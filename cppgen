@@ -12,7 +12,7 @@ mkdir -p "$NAME"/{"src","test"}
 cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
 LIBS=
-CFLAGS=-g -Wall -fuse-ld=lld \$(LIBS)
+CFLAGS=-g -Wall -Wextra -fuse-ld=lld \$(LIBS)
 
 CC=clang++
 OUTFILE=bin/\$(NAME)

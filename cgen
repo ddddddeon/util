@@ -19,7 +19,7 @@ if [ -z $LIB ]; then
     cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
 LIBS=
-CFLAGS=-g -Wall \$(LIBS) #-DDEBUG
+CFLAGS=-g -Wall -Wextra -fuse-ld=lld \$(LIBS) #-DDEBUG
 
 CC=clang
 OUTFILE=bin/\$(NAME)

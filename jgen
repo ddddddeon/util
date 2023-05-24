@@ -29,16 +29,12 @@ MANIFEST=manifest.txt
 	java -jar \$(CLASS_DIR)/\$(NAME).jar
 
 .PHONY: build
-build: findBin
+build: 
 	set -e; \\
 	rm \$(SRC_DIR)/*~ \$(SRC_DIR)/\#* 2>/dev/null || true; \\
 	if [ ! -d \$(CLASS_DIR) ]; then mkdir \$(CLASS_DIR); fi; \\
 	javac \$(SRC_DIR)/*.java -d \$(CLASS_DIR) \$(JAVA_OPTS); \\
 	jar cfm \$(CLASS_DIR)/\$(NAME).jar \$(MANIFEST) -C \$(CLASS_DIR) .; \\
-
-findBin:
-	@[ -d bin ];
-
 EOF
 
     cat <<EOF > "$NAME"/src/Main.java
