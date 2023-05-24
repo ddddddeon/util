@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+NAME=$1
+
+if [ $# -lt 1 ]; then
+    echo "Usage: cgen <project-name> [--lib]"
+    exit 1
+fi
+
+LIB=""
+if [ ! -z $2 ]; then
+    LIB="true"
+fi
+
+mkdir -p "$NAME"/{"src","test"}
+
+if [ -z $LIB ]; then
+
+    cat <<EOF > "$NAME"/Makefile
+NAME=$NAME
+LIBS=
+JAVA_OPTS=
+CLASS_DIR=bin
+SRC_DIR=src
+MANIFEST=manifest.txt
+
+.PHONY: \$(NAME)
+\$(NAME): build
+	java -jar \$(CLASS_DIR)/\$(NAME).jar
+
+.PHONY: build
+build: findBin
+	set -e; \\
+	rm \$(SRC_DIR)/*~ \$(SRC_DIR)/\#* 2>/dev/null || true; \\
+	if [ ! -d \$(CLASS_DIR) ]; then mkdir \$(CLASS_DIR); fi; \\
+	javac \$(SRC_DIR)/*.java -d \$(CLASS_DIR) \$(JAVA_OPTS); \\
+	jar cfm \$(CLASS_DIR)/\$(NAME).jar \$(MANIFEST) -C \$(CLASS_DIR) .; \\
+
+findBin:
+	@[ -d bin ];
+
+EOF
+
+    cat <<EOF > "$NAME"/src/Main.java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+	}
+}
+EOF
+
+else
+    cat <<EOF > "$NAME"/Makefile
+NAME=$NAME
+LIBS=
+JAVA_OPTS=
+CLASS_DIR=bin
+SRC_DIR=src
+MANIFEST=manifest.txt
+
+.PHONY: \$(NAME)
+\$(NAME): build
+	java -jar \$(CLASS_DIR)/\$(NAME).jar
+
+.PHONY: build
+build: findBin
+	set -e; \\
+	rm \$(SRC_DIR)/*~ \$(SRC_DIR)/\#* 2>/dev/null || true; \\
+	if [ ! -d \$(CLASS_DIR) ]; then mkdir \$(CLASS_DIR); fi; \\
+	javac \$(SRC_DIR)/*.java -d \$(CLASS_DIR) \$(JAVA_OPTS); \\
+	jar cfm \$(CLASS_DIR)/\$(NAME).jar \$(MANIFEST) -C \$(CLASS_DIR) .; \\
+
+findBin:
+	@[ -d bin ];
+
+EOF
+
+    cat <<EOF > "$NAME"/src/Main.java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+	}
+}
+EOF
+
+fi
+
+cat <<EOF > "$NAME"/.gitignore
+**/bin
+EOF
+
+cat <<EOF > "$NAME"/manifest.txt
+Main-Class: Main
+EOF
