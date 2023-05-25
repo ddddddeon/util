@@ -88,3 +88,7 @@ EOF
 cat <<EOF > "$NAME"/manifest.txt
 Main-Class: Main
 EOF
+
+cd "$NAME"
+mvn archetype:generate -DgroupId=com.ddddddeon -DartifactId=$NAME -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+mvn wrapper:wrapper
