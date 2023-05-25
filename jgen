@@ -2,6 +2,8 @@
 
 NAME=$1
 
+DOMAIN=com.ddddddeon
+
 if [ $# -lt 1 ]; then
     echo "Usage: cgen <project-name> [--lib]"
     exit 1
@@ -12,16 +14,18 @@ if [ ! -z $2 ]; then
     LIB="true"
 fi
 
-mkdir -p "$NAME"/{"src","test"}
+mvn archetype:generate -DgroupId=$DOMAIN -DartifactId=$NAME -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 
 if [ -z $LIB ]; then
 
     cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
+DOMAIN=$DOMAIN
 LIBS=
 JAVA_OPTS=
-CLASS_DIR=bin
+CLASS_DIR=target/classes
 SRC_DIR=src
+SRC_FILES=\$(wildcard \$(SRC_DIR)/**/*.java)
 MANIFEST=manifest.txt
 
 .PHONY: \$(NAME)
@@ -32,26 +36,20 @@ MANIFEST=manifest.txt
 build: 
 	set -e; \\
 	rm \$(SRC_DIR)/*~ \$(SRC_DIR)/\#* 2>/dev/null || true; \\
-	if [ ! -d \$(CLASS_DIR) ]; then mkdir \$(CLASS_DIR); fi; \\
-	javac \$(SRC_DIR)/*.java -d \$(CLASS_DIR) \$(JAVA_OPTS); \\
-	jar cfm \$(CLASS_DIR)/\$(NAME).jar \$(MANIFEST) -C \$(CLASS_DIR) .; \\
-EOF
-
-    cat <<EOF > "$NAME"/src/Main.java
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-	}
-}
+	if [ ! -d \$(CLASS_DIR) ]; then mkdir -p \$(CLASS_DIR); fi; \\
+    mvn compile; \\
+	jar cfm \$(CLASS_DIR)/\$(NAME).jar \$(MANIFEST) -C \$(CLASS_DIR)/ .;
 EOF
 
 else
     cat <<EOF > "$NAME"/Makefile
 NAME=$NAME
+DOMAIN=$DOMAIN
 LIBS=
 JAVA_OPTS=
-CLASS_DIR=bin
+CLASS_DIR=target/classes
 SRC_DIR=src
+SRC_FILES=\$(wildcard \$(SRC_DIR)/**/*.java)
 MANIFEST=manifest.txt
 
 .PHONY: \$(NAME)
@@ -59,24 +57,12 @@ MANIFEST=manifest.txt
 	java -jar \$(CLASS_DIR)/\$(NAME).jar
 
 .PHONY: build
-build: findBin
+build: 
 	set -e; \\
 	rm \$(SRC_DIR)/*~ \$(SRC_DIR)/\#* 2>/dev/null || true; \\
-	if [ ! -d \$(CLASS_DIR) ]; then mkdir \$(CLASS_DIR); fi; \\
-	javac \$(SRC_DIR)/*.java -d \$(CLASS_DIR) \$(JAVA_OPTS); \\
-	jar cfm \$(CLASS_DIR)/\$(NAME).jar \$(MANIFEST) -C \$(CLASS_DIR) .; \\
-
-findBin:
-	@[ -d bin ];
-
-EOF
-
-    cat <<EOF > "$NAME"/src/Main.java
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-	}
-}
+	if [ ! -d \$(CLASS_DIR) ]; then mkdir -p \$(CLASS_DIR); fi; \\
+    mvn compile; \\
+	jar cfm \$(CLASS_DIR)/\$(NAME).jar \$(MANIFEST) -C \$(CLASS_DIR)/ .;
 EOF
 
 fi
@@ -86,9 +72,8 @@ cat <<EOF > "$NAME"/.gitignore
 EOF
 
 cat <<EOF > "$NAME"/manifest.txt
-Main-Class: Main
+Main-Class: com.ddddddeon.App
 EOF
 
 cd "$NAME"
-mvn archetype:generate -DgroupId=com.ddddddeon -DartifactId=$NAME -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 mvn wrapper:wrapper
